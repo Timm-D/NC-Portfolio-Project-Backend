@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 
 const {getCategories} = require("./controllers/controller.categories")
+const {getUsers} = require("./controllers/controller.users")
 // app.use(express.json());
 
 app.get("/api/categories", getCategories);

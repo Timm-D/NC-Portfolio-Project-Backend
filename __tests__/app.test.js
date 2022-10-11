@@ -72,7 +72,7 @@ describe.only("GET api/users", () => {
       .get("/api/nousersherethen")
       .expect(404)
       .then((response) => {
-        expect(response.body).toEqaul({ msg: "Not Found" });
+        expect(response.body).toEqual({ msg: "Not Found" });
       });
   });
 });
