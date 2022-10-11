@@ -48,7 +48,7 @@ test("404: returns 'Not found' when url is incorrect", () => {
 });
 // TICKET 05
 
-describe("GET api/users", () => {
+describe.only("GET api/users", () => {
   test("200: responds with an array of users objects", () => {
     return request(app)
       .get("/api/users")
