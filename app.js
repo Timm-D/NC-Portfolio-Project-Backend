@@ -2,12 +2,37 @@ const express = require("express");
 const app = express();
 
 const {getCategories} = require("./controllers/controller.categories")
-// app.use(express.json());
+const {getReviewById} = require("./controllers/controller.reviews")
+ app.use(express.json());
 
 app.get("/api/categories", getCategories);
+
+app.get("/api/reviews/:review_id", getReviewById);
+
+
+
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not Found" });
 });
 
-module.exports = app;
+app.use((err, req, res, next) => {
+  if(err.code === "22P02") {
+    res.status(400).send({msg : "Invalid Input"})
+  } else {
+    next(err)
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.status) {
+    res.status(err.status).send({msg : err.msg})
+  }
+  next(err)
+})
+
+app.use((err, req, res, next) => {
+  res.status(500).send({msg: "Internal Server Error"})
+});
+
+module.exports = app
