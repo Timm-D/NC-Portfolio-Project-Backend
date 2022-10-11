@@ -5,6 +5,7 @@ const {getCategories} = require("./controllers/controller.categories")
 // app.use(express.json());
 
 app.get("/api/categories", getCategories);
+app.get("/api/users", getUsers)
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not Found" });
