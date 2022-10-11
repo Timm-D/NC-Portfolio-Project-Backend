@@ -47,7 +47,7 @@ test("404: returns 'Not found' when url is incorrect", () => {
     });
 });
 //TICKET 04
-describe("GET/api/reviews/:review_id", () => {
+describe.only("GET/api/reviews/:review_id", () => {
   test("200: responds with an object containing the properties of a given review_id", () => {
     return request(app)
       .get("/api/reviews/13")
@@ -69,6 +69,22 @@ describe("GET/api/reviews/:review_id", () => {
             votes: 16,
           })
         );
+      });
+  });
+  test("400: return 'invalid input' when given an invalid id type", () => {
+    return request(app)
+      .get("api/reviews/string")
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqaul({ msg: "Invalid Input" });
+      });
+  });
+  test("404: returns 'Not Found' when given an ID number not contained in the db", () => {
+    return request(app)
+      .get("api/reviews/999")
+      .expect(404)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: "Not Found" });
       });
   });
 });
