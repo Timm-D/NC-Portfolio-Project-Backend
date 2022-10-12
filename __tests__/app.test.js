@@ -71,7 +71,12 @@ describe.only("GET api/users", () => {
   test("404: returns 'Not Found' when url is incorrect", () => {
     return request(app)
       .get("/api/nousersherethen")
-
+      .expect(404)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: "Not Found" });
+      });
+  });
+});
 
 //TICKET 04
 describe("GET/api/reviews/:review_id", () => {
@@ -109,7 +114,6 @@ describe("GET/api/reviews/:review_id", () => {
   test("404: returns 'Not Found' when given an ID number not contained in the db", () => {
     return request(app)
       .get("/api/reviews/999")
-
       .expect(404)
       .then((response) => {
         expect(response.body).toEqual({ msg: "Not Found" });
