@@ -21,6 +21,7 @@ exports.fetchReviewById = (review_id) => {
 };
 
 
+
 exports.fetchCommentsByreview = (review_id) => {
   console.log("in the model")
   const query = `SELECT * FROM comments WHERE review_id = $1
@@ -31,3 +32,18 @@ exports.fetchCommentsByreview = (review_id) => {
   })
 
 }
+
+exports.updateReview = (review_id, inc_votes) => {
+  return db
+    .query(
+      `UPDATE reviews SET votes = votes + $2
+   WHERE review_id = $1 RETURNING *`,
+      [review_id, inc_votes]
+    )
+    .then(({ rows: [review] }) => {
+      if (!review) {
+        return Promise.reject({ status: 404, msg: "Not Found" });
+      }
+      return review;
+    });
+};
