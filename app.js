@@ -5,12 +5,7 @@ const {getCategories} = require("./controllers/controller.categories")
 
 const {getUsers} = require("./controllers/controller.users")
 
-
-const {getReviewById, getCommentsByReview} = require("./controllers/controller.reviews")
-
-
-
-const {getReviewById, patchReview} = require("./controllers/controller.reviews")
+const {getReviewById, patchReview, getCommentsByReview} = require("./controllers/controller.reviews")
 
  app.use(express.json());
 
