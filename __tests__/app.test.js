@@ -89,6 +89,15 @@ describe("GET/api/reviews/:review_id", () => {
         expect(response.body).toEqual({ msg: "Not Found" });
       });
   });
+  test("200: returned object also contains a comment_count property", () => {
+    return request(app)
+    .get("/api/reviews/13")
+    .expect(200)
+    .then(({body}) =>{
+      const {review} = body;
+      expect(review).toHaveProperty("comment_count")
+    } )
+  })
 });
 
 // TICKET 05
@@ -120,6 +129,7 @@ describe("GET api/users", () => {
         expect(response.body).toEqual({ msg: "Not Found" });
       });
   });
+  
 });
 
 //TICKET 06
