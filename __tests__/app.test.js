@@ -124,7 +124,7 @@ describe("GET/api/reviews/:review_id", () => {
 
 //TICKET 07
 
-describe.only("GET /api/reviews/:review_id/comments", () => {
+describe("GET /api/reviews/:review_id/comments", () => {
   test("200: responds with an array of comments objects for a given review_id", () => {
     return request(app)
       .get("/api/reviews/2/comments")
@@ -135,7 +135,7 @@ describe.only("GET /api/reviews/:review_id/comments", () => {
         expect(Array.isArray(comments)).toBe(true);
 
         comments.forEach((comment) => {
-          expect(comment).toEqaul(
+          expect(comment).toEqual(
             expect.objectContaining({
               comment_id: expect.any(Number),
               votes: expect.any(Number),
@@ -153,14 +153,15 @@ describe.only("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/string/comments")
       .expect(400)
       .then((response) => {
-        expect(response.body).toEqaul({ msg: "Invalid Input" });
+        expect(response.body).toEqual({ msg: "Invalid Input" });
       });
   });
-  test("404: responds with Not Found when no review id can be found", () => {
+  test.only("404: responds with Not Found when no review id can be found", () => {
     return request(app)
-      .get("/api/reviews/999/comments")
+      .get("/api/reviews/9999/comments")
       .expect(404)
       .then((response) => {
+        console.log(response.body)
         expect(response.body).toEqual({ msg: "Not Found" });
       });
   });
@@ -169,7 +170,7 @@ describe.only("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/1/comments")
       .expect(200)
       .then((response) => {
-        expect(response.body).toEqaul({ comments: [{}] });
+        expect(response.body).toEqual({ comments: [{}] });
       });
   });
 });

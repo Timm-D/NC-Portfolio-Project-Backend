@@ -16,3 +16,15 @@ exports.fetchReviewById = (review_id) => {
       return result.rows[0];
     });
 };
+
+
+exports.fetchCommentsByreview = (review_id) => {
+  console.log("in the model")
+  const query = `SELECT * FROM comments WHERE review_id = $1
+  ORDER BY created_at DESC`;
+
+  return db.query(query, [review_id]).then(({rows : comments}) => {
+    return comments;
+  })
+
+}
