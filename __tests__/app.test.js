@@ -120,57 +120,65 @@ describe("GET/api/reviews/:review_id", () => {
         expect(response.body).toEqual({ msg: "Not Found" });
       });
   });
+  test.only("200: returned object also contains a comment_count property", () => {
+    return request(app)
+    .get("/api/reviews/13")
+    .expect(200)
+    .then(({body}) =>{
+      const {review} = body;
+      expect(review).toHaveProperty("comment_count")
+    } )
+  })
 });
 
-//TICKET 07
+//TICKET 09
 
-describe("GET /api/reviews/:review_id/comments", () => {
-  test("200: responds with an array of comments objects for a given review_id", () => {
-    return request(app)
-      .get("/api/reviews/2/comments")
-      .expect(200)
-      .then(({ body }) => {
-        const { comments } = body;
-        expect(comments.length).toBe(3);
-        expect(Array.isArray(comments)).toBe(true);
+// describe("GET /api/reviews/:review_id/comments", () => {
+//   test("200: responds with an array of comments objects for a given review_id", () => {
+//     return request(app)
+//       .get("/api/reviews/2/comments")
+//       .expect(200)
+//       .then(({ body }) => {
+//         const { comments } = body;
+//         expect(comments.length).toBe(3);
+//         expect(Array.isArray(comments)).toBe(true);
 
-        comments.forEach((comment) => {
-          expect(comment).toEqual(
-            expect.objectContaining({
-              comment_id: expect.any(Number),
-              votes: expect.any(Number),
-              review_id: expect.any(Number),
-              created_at: expect.any(String),
-              author: expect.any(String),
-              body: expect.any(String),
-            })
-          );
-        });
-      });
-  });
-  test("400: responds with invalid input when given review_id is incorrect type", () => {
-    return request(app)
-      .get("/api/reviews/string/comments")
-      .expect(400)
-      .then((response) => {
-        expect(response.body).toEqual({ msg: "Invalid Input" });
-      });
-  });
-  test.only("404: responds with Not Found when no review id can be found", () => {
-    return request(app)
-      .get("/api/reviews/9999/comments")
-      .expect(404)
-      .then((response) => {
-        console.log(response.body)
-        expect(response.body).toEqual({ msg: "Not Found" });
-      });
-  });
-  test("200: responds with an empty array when there are no comments on a given review", () => {
-    return request(app)
-      .get("/api/reviews/1/comments")
-      .expect(200)
-      .then((response) => {
-        expect(response.body).toEqual({ comments: [{}] });
-      });
-  });
-});
+//         comments.forEach((comment) => {
+//           expect(comment).toEqual(
+//             expect.objectContaining({
+//               comment_id: expect.any(Number),
+//               votes: expect.any(Number),
+//               review_id: expect.any(Number),
+//               created_at: expect.any(String),
+//               author: expect.any(String),
+//               body: expect.any(String),
+//             })
+//           );
+//         });
+//       });
+//   });
+//   test("400: responds with invalid input when given review_id is incorrect type", () => {
+//     return request(app)
+//       .get("/api/reviews/string/comments")
+//       .expect(400)
+//       .then((response) => {
+//         expect(response.body).toEqual({ msg: "Invalid Input" });
+//       });
+//   });
+//   test.only("404: responds with Not Found when no review id can be found", () => {
+//     return request(app)
+//       .get("/api/reviews/999/comments")
+//       .expect(404)
+//       .then((response) => {
+//         expect(response.body).toEqual({ msg: "Not Found" });
+//       });
+//   });
+//   test("200: responds with an empty array when there are no comments on a given review", () => {
+//     return request(app)
+//       .get("/api/reviews/1/comments")
+//       .expect(200)
+//       .then((response) => {
+//         expect(response.body).toEqual({ comments: [] });
+//       });
+//   });
+// });
