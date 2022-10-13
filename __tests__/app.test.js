@@ -7,6 +7,7 @@ const testData = require("../db/data/test-data");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const app = require("../app");
+const { forEach } = require("../db/data/test-data/categories");
 
 beforeEach(() => {
   return seed(testData);
@@ -49,7 +50,7 @@ test("404: returns 'Not found' when url is incorrect", () => {
 
 // TICKET 05
 
-describe.only("GET api/users", () => {
+describe("GET api/users", () => {
   test("200: responds with an array of users objects", () => {
     return request(app)
       .get("/api/users")
@@ -117,6 +118,32 @@ describe("GET/api/reviews/:review_id", () => {
       .expect(404)
       .then((response) => {
         expect(response.body).toEqual({ msg: "Not Found" });
+      });
+  });
+});
+
+//TICKET 07
+
+describe.only("GET /api/reviews/:review_id/comments", () => {
+  test("200: responds with an array of comments objects for a given review_id", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(3);
+        expect(Array.isArray(comments)).toBe(true);
+
+        comments.forEach((comment) => {
+          expect(comment).toEqaul(expect.objectContaining({
+            comment_id : expect.any(Number),
+            votes : expect.any(Number),
+            review_id : expect.any(Number),
+            created_at : expect.any(String),
+            author: expect.any(String),
+            body : expect.any(String)
+          }));
+        });
       });
   });
 });
