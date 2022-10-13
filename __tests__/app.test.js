@@ -153,8 +153,23 @@ describe.only("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/string/comments")
       .expect(400)
       .then((response) => {
-        expect(response.body).toEqaul({msg : "Invalid Input"})
+        expect(response.body).toEqaul({ msg: "Invalid Input" });
       });
   });
-  test("400")
+  test("404: responds with Not Found when no review id can be found", () => {
+    return request(app)
+      .get("/api/reviews/999/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: "Not Found" });
+      });
+  });
+  test("200: responds with an empty array when there are no comments on a given review", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqaul({ comments: [{}] });
+      });
+  });
 });
