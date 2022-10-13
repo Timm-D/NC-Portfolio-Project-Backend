@@ -14,7 +14,7 @@ app.get("/api/users", getUsers)
 
 app.get("/api/reviews/:review_id", getReviewById);
 
-
+app.get("/api/reviews/:review_id/comments", getCommentsByReview )
 
 
 app.all("/*", (req, res) => {
