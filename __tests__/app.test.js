@@ -147,7 +147,7 @@ describe("PATCH api/reviews/:review_id", () => {
             created_at: expect.any(String),
             votes: 26,
           })
-         );
+        );
       });
   });
   test("400: returns 'Invalid Data' when given inc_votes of the wrong type", () => {
@@ -189,6 +189,47 @@ describe("PATCH api/reviews/:review_id", () => {
     return request(app)
       .patch("/api/reviews/999")
       .send(requestObject)
+      .expect(404)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: "Not Found" });
+      });
+  });
+});
+
+//TICKET 08
+
+describe("GET/api/reviews", () => {
+  test("200: responds with a reviews object containing an array of reviews sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", { descending: true });
+        expect(reviews.length).toBe(13);
+        expect(Array.isArray).toBe(true);
+
+        reviews.forEach((review) => {
+          expect(review).toEqaul(
+            expect.objectContaining({
+              owner: expect.any(String),
+              title: expect.any(String),
+              review_id: expect.any(Number),
+              category: expect.any(String),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              designer: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+
+  test("404: responds with Not Found when a category does not exist", () => {
+    return request(app)
+      .get("/api/reviews?category=nothere")
       .expect(404)
       .then((response) => {
         expect(response.body).toEqual({ msg: "Not Found" });
