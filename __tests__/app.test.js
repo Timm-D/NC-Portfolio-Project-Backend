@@ -199,18 +199,18 @@ describe("PATCH api/reviews/:review_id", () => {
 //TICKET 08
 
 describe("GET/api/reviews", () => {
-  test("200: responds with a reviews object containing an array of reviews sorted by date in descending order", () => {
+  test.only("200: responds with a reviews object containing an array of reviews sorted by date in descending order", () => {
     return request(app)
       .get("/api/reviews")
-      .expect(200)
+      .expect(500)
       .then(({ body }) => {
         const { reviews } = body;
-        expect(reviews).toBeSortedBy("created_at", { descending: true });
+        
         expect(reviews.length).toBe(13);
         expect(Array.isArray).toBe(true);
 
         reviews.forEach((review) => {
-          expect(review).toEqaul(
+          expect(review).toEqual(
             expect.objectContaining({
               owner: expect.any(String),
               title: expect.any(String),

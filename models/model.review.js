@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const format = require("pg-format");
+const reviews = require("../db/data/test-data/reviews");
 
 exports.fetchReviewById = (review_id) => {
   return db
@@ -16,6 +17,10 @@ exports.fetchReviewById = (review_id) => {
       return result.rows[0];
     });
 };
+
+exports.fetchReviews = 
+
+
 
 exports.updateReview = (review_id, inc_votes) => {
   return db
