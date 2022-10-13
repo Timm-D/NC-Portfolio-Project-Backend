@@ -92,7 +92,7 @@ describe("GET/api/reviews/:review_id", () => {
 
 // TICKET 05
 
-describe.only("GET api/users", () => {
+describe("GET api/users", () => {
   test("200: responds with an array of users objects", () => {
     return request(app)
       .get("/api/users")
@@ -123,9 +123,9 @@ describe.only("GET api/users", () => {
 
 //TICKET 06
 
-describe.only("PATCH api/reviews/:review_id", () => {
+describe("PATCH api/reviews/:review_id", () => {
   test("200: responds with review object updated to reflect impact of newVote", () => {
-    let requestObject = { inc_votes: 10 };
+    const requestObject = { inc_votes: 10 };
 
     return request(app)
       .patch("/api/reviews/13")
@@ -147,7 +147,7 @@ describe.only("PATCH api/reviews/:review_id", () => {
             created_at: expect.any(String),
             votes: 26,
           })
-        );
+         );
       });
   });
   test("400: returns 'Invalid Data' when given inc_votes of the wrong type", () => {
@@ -158,40 +158,40 @@ describe.only("PATCH api/reviews/:review_id", () => {
       .send(requestObject)
       .expect(400)
       .then((response) => {
-        expect(response.body).toEqual({ msg : "inc_votes Invalid Datatype"})
+        expect(response.body).toEqual({ msg: "Invalid Input" });
       });
   });
   test("400: returns 'Invalid' when given review_id of incorrect type", () => {
-    const requestObject = {inc_votes: 10}
+    const requestObject = { inc_votes: 10 };
 
     return request(app)
-    .patch("/api/reviews/string")
-    .send(requestObject)
-    .expect(400)
-    .then((response) => {
-      expect(response.body).toEqaul({msg: "Invalid review_id"})
-    })
-  })
+      .patch("/api/reviews/random")
+      .send(requestObject)
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: "Invalid Input" });
+      });
+  });
   test("400: returns 'Invalid' when given broken requestObject", () => {
-    const requestObject = {cni_setov : 10}
+    const requestObject = { cni_setov: 10 };
 
     return request(app)
-    .patch("/api/reviews/13")
-    .send(requestObject)
-    .expect(400)
-    .then((response) => {
-      expect(response.body).toEqual({msg : "Invalid post object"})
-    })
-  })
+      .patch("/api/reviews/13")
+      .send(requestObject)
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: "Invalid Input" });
+      });
+  });
   test("404: returns 'Not Found' when given a review_id which does not exist in the db", () => {
-    const requestObject = {inc_votes : 10}
+    const requestObject = { inc_votes: 10 };
 
     return request(app)
-    .patch("/api/reviews/999")
-    .send(requestObject)
-    .expect(404)
-    .then((response) => {
-      expect(response.body).toEqual({msg : "Not Found"})
-    })
-  })
+      .patch("/api/reviews/999")
+      .send(requestObject)
+      .expect(404)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: "Not Found" });
+      });
+  });
 });
