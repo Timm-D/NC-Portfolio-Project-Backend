@@ -1,4 +1,8 @@
+
+const { fetchReviewById, fetchCommentsByreview } = require("../models/model.review");
+
 const { fetchReviewById, updateReview} = require("../models/model.review");
+
 
 exports.getReviewById = (req, res, next) => {
   const { review_id } = req.params;
@@ -8,6 +12,15 @@ exports.getReviewById = (req, res, next) => {
     })
     .catch(next);
 };
+
+
+exports.getCommentsByReview = (req, res, next) => {
+  console.log("in the controller")
+  const {review_id} = req.params
+  fetchCommentsByreview(review_id).then((comments) => {
+    res.status(200).send({ comments });
+  })
+  .catch(next)
 
 exports.patchReview = (req, res, next) => {
   const { review_id } = req.params;
@@ -24,4 +37,5 @@ exports.patchReview = (req, res, next) => {
       err.inc_votes = inc_votes;
       next(err);
     });
+
 };
