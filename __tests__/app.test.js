@@ -202,12 +202,11 @@ describe("GET/api/reviews", () => {
   test.only("200: responds with a reviews object containing an array of reviews sorted by date in descending order", () => {
     return request(app)
       .get("/api/reviews")
-      .expect(500)
+      .expect(200)
       .then(({ body }) => {
         const { reviews } = body;
         
         expect(reviews.length).toBe(13);
-        expect(Array.isArray).toBe(true);
 
         reviews.forEach((review) => {
           expect(review).toEqual(

@@ -19,20 +19,19 @@ exports.fetchReviewById = (review_id) => {
 };
 
 exports.fetchReviews = 
+ 
 
-
-
-exports.updateReview = (review_id, inc_votes) => {
-  return db
-    .query(
-      `UPDATE reviews SET votes = votes + $2
-   WHERE review_id = $1 RETURNING *`,
-      [review_id, inc_votes]
-    )
-    .then(({ rows: [review] }) => {
-      if (!review) {
-        return Promise.reject({ status: 404, msg: "Not Found" });
-      }
-      return review;
-    });
-};
+// exports.updateReview = (review_id, inc_votes) => {
+//   return db
+//     .query(
+//       `UPDATE reviews SET votes = votes + $2
+//    WHERE review_id = $1 RETURNING *`,
+//       [review_id, inc_votes]
+//     )
+//     .then(({ rows: [review] }) => {
+//       if (!review) {
+//         return Promise.reject({ status: 404, msg: "Not Found" });
+//       }
+//       return review;
+//     });
+// };
