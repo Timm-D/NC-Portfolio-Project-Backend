@@ -135,15 +135,26 @@ describe.only("GET /api/reviews/:review_id/comments", () => {
         expect(Array.isArray(comments)).toBe(true);
 
         comments.forEach((comment) => {
-          expect(comment).toEqaul(expect.objectContaining({
-            comment_id : expect.any(Number),
-            votes : expect.any(Number),
-            review_id : expect.any(Number),
-            created_at : expect.any(String),
-            author: expect.any(String),
-            body : expect.any(String)
-          }));
+          expect(comment).toEqaul(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              review_id: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+            })
+          );
         });
       });
   });
+  test("400: responds with invalid input when given review_id is incorrect type", () => {
+    return request(app)
+      .get("/api/reviews/string/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body).toEqaul({msg : "Invalid Input"})
+      });
+  });
+  test("400")
 });
