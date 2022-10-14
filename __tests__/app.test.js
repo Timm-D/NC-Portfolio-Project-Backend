@@ -256,7 +256,7 @@ describe.only("/api/reviews", () => {
     });
     test("404: responds 404 and an error message when passed a query that does not match a category", () => {
       return request(app)
-        .get("/api/reviews?category=socidfsa")
+        .get("/api/reviews?category=randoms")
         .expect(404)
         .then((response) => {
           expect(response.body.message).toEqual(
