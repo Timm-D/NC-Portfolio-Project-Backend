@@ -20,7 +20,7 @@ app.get("/api/reviews", getReviews);
 
 app.get("/api/reviews/:review_id", getReviewById);
 
-app.patch("/api/reviews/:review_id", patchReview);
+// app.patch("/api/reviews/:review_id", patchReview);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not Found" });

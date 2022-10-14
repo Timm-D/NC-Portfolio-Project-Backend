@@ -18,20 +18,23 @@ exports.fetchReviewById = (review_id) => {
     });
 };
 
-exports.fetchReviews = 
- 
+exports.fetchReviews = async (category) => {
 
-// exports.updateReview = (review_id, inc_votes) => {
-//   return db
-//     .query(
-//       `UPDATE reviews SET votes = votes + $2
-//    WHERE review_id = $1 RETURNING *`,
-//       [review_id, inc_votes]
-//     )
-//     .then(({ rows: [review] }) => {
-//       if (!review) {
-//         return Promise.reject({ status: 404, msg: "Not Found" });
-//       }
-//       return review;
-//     });
-// };
+  let queryString = `SELECT reviews.*, COUNT(comment_id) ::INT AS comment_count 
+  FROM reviews 
+  LEFT JOIN comments ON reviews.review_id = comments.review_id 
+  GROUP BY reviews.review_id
+  ORDER BY created_at DESC`;
+  if(category) {
+    queryString += format(` HAVING category = %L `, category)
+  }
+
+  const reviews = await db.query(queryString)
+  
+  
+  if(!reviews.rows.length){
+    return Promise.reject({status: 404, msg: "Not Found"})
+  } 
+  return reviews.rows
+}
+

@@ -198,16 +198,14 @@ describe("PATCH api/reviews/:review_id", () => {
 
 //TICKET 08
 
-describe("GET/api/reviews", () => {
-  test.only("200: responds with a reviews object containing an array of reviews sorted by date in descending order", () => {
+describe.only("GET/api/reviews", () => {
+  test("200: responds with a reviews object containing an array of reviews sorted by date in descending order", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
       .then(({ body }) => {
         const { reviews } = body;
-        
         expect(reviews.length).toBe(13);
-
         reviews.forEach((review) => {
           expect(review).toEqual(
             expect.objectContaining({
@@ -225,10 +223,39 @@ describe("GET/api/reviews", () => {
         });
       });
   });
-
-  test("404: responds with Not Found when a category does not exist", () => {
+  test("200: response is filtered by category when provided valid category", () => {
     return request(app)
-      .get("/api/reviews?category=nothere")
+      .get("api/reviews?category=dexterity")
+      .expect("200")
+      .then((response) => {
+        const { reviews } = response.body;
+        reviews.forEach((user) => {
+          expect(user).toEqual({
+            category: "dexterity",
+          });
+        });
+      });
+  });
+  test("200: responds with an empty array when category is valid but has no reviews", () => {
+    return request(app)
+      .get("/api/reviews?category=oldgames") //how to select a category with 0 reviews?
+      .expect(200)
+      .then((response) => {
+        expect(response.body.reviews).toEqaul([]);
+      });
+  });
+
+  test("404: responds with Not Found when given incorrect path", () => {
+    return request(app)
+      .get("/api/nothing")
+      .expect(404)
+      .then((response) => {
+        expect(response.body).toEqual({ msg: "Not Found" });
+      });
+  });
+  test("404: responds with Not found when category is non-existent", () => {
+    return request(app)
+      .get("/api/reviews?category=apple")
       .expect(404)
       .then((response) => {
         expect(response.body).toEqual({ msg: "Not Found" });
