@@ -198,67 +198,71 @@ describe("PATCH api/reviews/:review_id", () => {
 
 //TICKET 08
 
-describe.only("GET/api/reviews", () => {
-  test("200: responds with a reviews object containing an array of reviews sorted by date in descending order", () => {
-    return request(app)
-      .get("/api/reviews")
-      .expect(200)
-      .then(({ body }) => {
-        const { reviews } = body;
-        expect(reviews.length).toBe(13);
-        reviews.forEach((review) => {
-          expect(review).toEqual(
-            expect.objectContaining({
-              owner: expect.any(String),
-              title: expect.any(String),
-              review_id: expect.any(Number),
-              category: expect.any(String),
-              review_img_url: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              designer: expect.any(String),
-              comment_count: expect.any(Number),
-            })
+describe.only("/api/reviews", () => {
+  describe('/api/reviews', () => {
+    test("200: responds with all reviews if no query is set in descending order", () => {
+      return request(app)
+        .get("/api/reviews")
+        .expect(200)
+        .then((reviews) => {
+          const body = reviews.body.reviews;
+          expect(body.length === 13).toBe(true);
+          body.forEach((review) => {
+            expect(review.hasOwnProperty("review_id")).toBe(true);
+            expect(review.hasOwnProperty("title")).toBe(true);
+            expect(review.hasOwnProperty("category")).toBe(true);
+            expect(review.hasOwnProperty("designer")).toBe(true);
+            expect(review.hasOwnProperty("owner")).toBe(true);
+            expect(review.hasOwnProperty("review_body")).toBe(true);
+            expect(review.hasOwnProperty("review_img_url")).toBe(true);
+            expect(review.hasOwnProperty("created_at")).toBe(true);
+            expect(review.hasOwnProperty("votes")).toBe(true);
+            expect(review.hasOwnProperty("comment_count")).toBe(true);
+          });
+          expect(body).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+    test("200: responds with reviews matching a query in descending date order", () => {
+      return request(app)
+        .get("/api/reviews?category=social deduction")
+        .expect(200)
+        .then((reviews) => {
+          const body = reviews.body.reviews;
+          expect(body.length === 11).toBe(true);
+          body.forEach((review) => {
+            expect(review.hasOwnProperty("review_id")).toBe(true);
+            expect(review.hasOwnProperty("title")).toBe(true);
+            expect(review.hasOwnProperty("category")).toBe(true);
+            expect(review.hasOwnProperty("designer")).toBe(true);
+            expect(review.hasOwnProperty("owner")).toBe(true);
+            expect(review.hasOwnProperty("review_body")).toBe(true);
+            expect(review.hasOwnProperty("review_img_url")).toBe(true);
+            expect(review.hasOwnProperty("created_at")).toBe(true);
+            expect(review.hasOwnProperty("votes")).toBe(true);
+            expect(review.hasOwnProperty("comment_count")).toBe(true);
+            expect(review.category).toBe("social deduction");
+          });
+          expect(body).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+    test("200: responds with a 200 and an empty array when passed a valid query that has no reviews associated", () => {
+      return request(app)
+        .get("/api/reviews?category=children's games")
+        .expect(200)
+        .then((reviews) => {
+          const body = reviews.body.reviews;
+          expect(body.length === 0);
+        });
+    });
+    test("404: responds 404 and an error message when passed a query that does not match a category", () => {
+      return request(app)
+        .get("/api/reviews?category=socidfsa")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.message).toEqual(
+            "Not Found"
           );
         });
-      });
-  });
-  test("200: response is filtered by category when provided valid category", () => {
-    return request(app)
-      .get("api/reviews?category=dexterity")
-      .expect("200")
-      .then((response) => {
-        const { reviews } = response.body;
-        reviews.forEach((user) => {
-          expect(user).toEqual({
-            category: "dexterity",
-          });
-        });
-      });
-  });
-  test("200: responds with an empty array when category is valid but has no reviews", () => {
-    return request(app)
-      .get("/api/reviews?category=oldgames") //how to select a category with 0 reviews?
-      .expect(200)
-      .then((response) => {
-        expect(response.body.reviews).toEqaul([]);
-      });
-  });
-
-  test("404: responds with Not Found when given incorrect path", () => {
-    return request(app)
-      .get("/api/nothing")
-      .expect(404)
-      .then((response) => {
-        expect(response.body).toEqual({ msg: "Not Found" });
-      });
-  });
-  test("404: responds with Not found when category is non-existent", () => {
-    return request(app)
-      .get("/api/reviews?category=apple")
-      .expect(404)
-      .then((response) => {
-        expect(response.body).toEqual({ msg: "Not Found" });
-      });
-  });
-});
+    })
+  })
+})

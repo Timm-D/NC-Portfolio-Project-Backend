@@ -18,23 +18,34 @@ exports.fetchReviewById = (review_id) => {
     });
 };
 
-exports.fetchReviews = async (category) => {
+exports.fetchReviews = (query) => {
+  const selectJoin = `SELECT reviews.*, COUNT(comments.review_id) AS comment_count 
+  FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id`;
 
-  let queryString = `SELECT reviews.*, COUNT(comment_id) ::INT AS comment_count 
-  FROM reviews 
-  LEFT JOIN comments ON reviews.review_id = comments.review_id 
-  GROUP BY reviews.review_id
+  const queryStatement = " WHERE reviews.category = $1";
+
+  const groupOrder = ` GROUP BY comments.review_id, reviews.review_id 
   ORDER BY created_at DESC`;
-  if(category) {
-    queryString += format(` HAVING category = %L `, category)
+
+  if (query === undefined) {
+    return db.query(selectJoin + groupOrder).then((reviews) => {
+      return reviews.rows;
+    });
   }
-
-  const reviews = await db.query(queryString)
-  
-  
-  if(!reviews.rows.length){
-    return Promise.reject({status: 404, msg: "Not Found"})
-  } 
-  return reviews.rows
-}
-
+  if (query !== undefined)
+    return db
+      .query("SELECT * FROM categories WHERE slug = $1", [query])
+      .then((response) => {
+        if (response.rows.length === 0) {
+          return Promise.reject({
+            status: 404,
+            message: "Not Found",
+          });
+        }
+        return db
+          .query(selectJoin + queryStatement + groupOrder, [query])
+          .then((review) => {
+            return review.rows;
+          });
+      });
+};
