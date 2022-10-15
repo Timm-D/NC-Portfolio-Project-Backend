@@ -21,33 +21,6 @@ exports.fetchReviewById = (review_id) => {
     });
 };
 
-
-exports.fetchReviews = (query) => {
-  const selectJoin = `SELECT reviews.*, COUNT(comments.review_id) AS comment_count 
-  FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id`;
-
-  const queryStatement = " WHERE reviews.category = $1";
-
-  const groupOrder = ` GROUP BY comments.review_id, reviews.review_id 
-  ORDER BY created_at DESC`;
-
-  if (query === undefined) {
-    return db.query(selectJoin + groupOrder).then((reviews) => {
-      return reviews.rows;
-
-
-
-exports.fetchCommentsByreview = (review_id) => {
-  console.log("in the model")
-  const query = `SELECT * FROM comments WHERE review_id = $1
-  ORDER BY created_at DESC`;
-
-  return db.query(query, [review_id]).then(({rows : comments}) => {
-    return comments;
-  })
-
-}
-
 exports.updateReview = (review_id, inc_votes) => {
   return db
     .query(
@@ -63,6 +36,21 @@ exports.updateReview = (review_id, inc_votes) => {
 
     });
   }
+
+
+exports.fetchReviews = (query) => {
+  const selectJoin = `SELECT reviews.*, COUNT(comments.review_id) AS comment_count 
+  FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id`;
+
+  const queryStatement = " WHERE reviews.category = $1";
+
+  const groupOrder = ` GROUP BY comments.review_id, reviews.review_id 
+  ORDER BY created_at DESC`;
+
+  if (query === undefined) {
+    return db.query(selectJoin + groupOrder).then((reviews) => {
+      return reviews.rows;
+      
   if (query !== undefined)
     return db
       .query("SELECT * FROM categories WHERE slug = $1", [query])
