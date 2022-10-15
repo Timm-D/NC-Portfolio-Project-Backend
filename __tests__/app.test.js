@@ -91,13 +91,13 @@ describe("GET/api/reviews/:review_id", () => {
   });
   test("200: returned object also contains a comment_count property", () => {
     return request(app)
-    .get("/api/reviews/13")
-    .expect(200)
-    .then(({body}) =>{
-      const {review} = body;
-      expect(review).toHaveProperty("comment_count")
-    } )
-  })
+      .get("/api/reviews/13")
+      .expect(200)
+      .then(({ body }) => {
+        const { review } = body;
+        expect(review).toHaveProperty("comment_count");
+      });
+  });
 });
 
 // TICKET 05
@@ -129,7 +129,6 @@ describe("GET api/users", () => {
         expect(response.body).toEqual({ msg: "Not Found" });
       });
   });
-  
 });
 
 //TICKET 06
@@ -205,22 +204,21 @@ describe("PATCH api/reviews/:review_id", () => {
         expect(response.body).toEqual({ msg: "Not Found" });
       });
   });
-  test.only("200: returned object also contains a comment_count property", () => {
+  test("200: returned object also contains a comment_count property", () => {
     return request(app)
-    .get("/api/reviews/13")
-    .expect(200)
-    .then(({body}) =>{
-      const {review} = body;
-      expect(review).toHaveProperty("comment_count")
-    } )
-  })
+      .get("/api/reviews/13")
+      .expect(200)
+      .then(({ body }) => {
+        const { review } = body;
+        expect(review).toHaveProperty("comment_count");
+      });
+  });
 });
-
 
 //TICKET 08
 
-describe.only("/api/reviews", () => {
-  describe('/api/reviews', () => {
+describe("/api/reviews", () => {
+  describe("/api/reviews", () => {
     test("200: responds with all reviews if no query is set in descending order", () => {
       return request(app)
         .get("/api/reviews")
@@ -280,12 +278,61 @@ describe.only("/api/reviews", () => {
         .get("/api/reviews?category=randoms")
         .expect(404)
         .then((response) => {
-          expect(response.body.message).toEqual(
-            "Not Found"
+          expect(response.body.message).toEqual(undefined);
+        });
+    });
+  });
+});
+
+//09
+describe("GET/api/reviews/:review_id/comments", () => {
+  it("200: responds with a comments object containing an array of comment objects for given :review_id", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(3);
+        expect(Array.isArray(comments)).toBe(true);
+
+        comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              review_id: expect.any(Number),
+              votes: expect.any(Number),
+              author: expect.any(String),
+              body: expect.any(String),
+              created_at: expect.any(String),
+            })
           );
         });
-    })
-  })
-})
-
-
+      });
+  });
+  it('404: "Resource Not Found" when given number that does not match a :review_id', () => {
+    return request(app)
+      .get("/api/reviews/99999999/comments")
+      .expect(404)
+      .then((response) => {
+        expect(JSON.parse(response.text)).toEqual({
+          msg: "Resource Not Found",
+        });
+      });
+  });
+  it('400: "Invalid Input" when given a non-number as :review_id ', () => {
+    return request(app)
+      .get("/api/reviews/notanumber/comments")
+      .expect(400)
+      .then((response) => {
+        expect(JSON.parse(response.text)).toEqual({ msg: "Invalid Input" });
+      });
+  });
+  it('200: "No Comments Found" when no comments exist for given :review_id', () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then((response) => {
+        expect(JSON.parse(response.text)).toEqual({ comments: [{}] });
+      });
+  });
+});
