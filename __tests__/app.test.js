@@ -336,3 +336,77 @@ describe("GET/api/reviews/:review_id/comments", () => {
       });
   });
 });
+describe("POST/api/reviews/:review_id/comments", () => {
+  it("201: adds a comment to :review_id and responds with comment", () => {
+    const sentObj = { username: "dav3rid", body: "I R8 8/8 M8" };
+
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(sentObj)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual(
+          expect.objectContaining({
+            comment_id: 7,
+            author: "dav3rid",
+            body: "I R8 8/8 M8",
+            votes: 0,
+            review_id: 1,
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+
+  it('400: "Invalid Input" when body does not contain both "username" and "body" keys', () => {
+    const sentObj = { notaname: "dav3rid", body: "I R8 8/8 M8" };
+
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(sentObj)
+      .expect(400)
+      .then((response) => {
+        expect(JSON.parse(response.text)).toEqual({ msg: "Invalid Input" });
+      });
+  });
+
+  it('404: "Resource Not Found" when username not in database tries to post', () => {
+    const sentObj = { username: "Patrik", body: "Pretty good" };
+
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(sentObj)
+      .expect(404)
+      .then((response) => {
+        expect(JSON.parse(response.text)).toEqual({
+          msg: "Resource Not Found",
+        });
+      });
+  });
+
+  it('404: "Resource Not Found" when given number that does not match a :review_id', () => {
+    const sentObj = { username: "dav3rid", body: "I R8 8/8 M8" };
+
+    return request(app)
+      .post("/api/reviews/99999999/comments")
+      .send(sentObj)
+      .expect(404)
+      .then((response) => {
+        expect(JSON.parse(response.text)).toEqual({
+          msg: "Resource Not Found",
+        });
+      });
+  });
+
+  it('400: "Resource Not Found" when given a non-number as :review_id ', () => {
+    const sentObj = { notaname: "dav3rid", body: "I R8 8/8 M8" };
+
+    return request(app)
+      .post("/api/reviews/notanumber/comments")
+      .send(sentObj)
+      .expect(400)
+      .then((response) => {
+        expect(JSON.parse(response.text)).toEqual({ msg: "Invalid Input" });
+      });
+  });
+});
