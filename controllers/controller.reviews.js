@@ -46,3 +46,11 @@ exports.getCommentsForReview = (req, res, next) => {
   })
   .catch(next)
 }
+
+exports.postComment = async (req, res, next) => {
+  createComment(req.params, req.body)
+  .then (comment => {
+      res.status(201).send({comment})
+  })
+  .catch(next)
+}
