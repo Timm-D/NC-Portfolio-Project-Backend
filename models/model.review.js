@@ -1,7 +1,7 @@
 const db = require("../db/connection");
 const format = require("pg-format");
 const reviews = require("../db/data/test-data/reviews");
-const {checkIfDataExists} = require("./model.check");
+const { checkIfDataExists } = require("./model.check");
 
 exports.fetchReviewById = (review_id) => {
   return db
@@ -77,4 +77,34 @@ exports.fetchCommentsForReview = async ({ review_id }) => {
     return [{}];
   }
   return comments.rows;
+};
+
+exports.createComment = (username, review_id, body) => {
+  if (!username || !body) {
+    return Promise.reject({
+      status: 400,
+      msg: `Ivalid input`,
+    });
+  }
+  return db
+    .query(
+      `
+  INSERT INTO comments
+  (author, review_id, votes, created_at, body)
+  VALUES
+  ($1, $2, null , null , $3)
+  RETURNING *;`,
+      [username, review_id, body]
+    )
+    .then((result) => {
+      const review = result.rows[0];
+      if (!review) {
+        return Promise.reject({
+          status: 404,
+          msg: `Not Found`,
+        });
+      }
+
+      return result.rows[0].body;
+    });
 };

@@ -3,6 +3,8 @@ const {
   updateReview,
   fetchReviews,
   fetchCommentsForReview,
+  createComment
+
 } = require("../models/model.review");
 
 exports.getReviewById = (req, res, next) => {
@@ -47,10 +49,13 @@ exports.getCommentsForReview = (req, res, next) => {
   .catch(next)
 }
 
-exports.postComment = async (req, res, next) => {
-  createComment(req.params, req.body)
-  .then (comment => {
-      res.status(201).send({comment})
+exports.postComment = (req, res, next) => {
+  const { review_id } = req.params;
+  const { username, body } = req.body;
+
+  createComment(review_id, username, body)
+  .then((newComment) => {
+    res.status(201).send({ newComment })
   })
   .catch(next)
 }

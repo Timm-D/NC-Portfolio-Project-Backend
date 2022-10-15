@@ -336,77 +336,73 @@ describe("GET/api/reviews/:review_id/comments", () => {
       });
   });
 });
-describe("POST/api/reviews/:review_id/comments", () => {
-  it("201: adds a comment to :review_id and responds with comment", () => {
-    const sentObj = { username: "dav3rid", body: "I R8 8/8 M8" };
 
-    return request(app)
-      .post("/api/reviews/1/comments")
-      .send(sentObj)
+//10
+describe('/api/reviews/:review_id/comments', () => {
+  test('201: creates new comment and returns the comment', () => {
+      const username = "mallionaire"
+      const body = "This game slaps!"
+      const review_id = 2
+      return request(app)
+      .post(`/api/reviews/${review_id}/comments`)
+      .send({username: username,
+             body: body})
       .expect(201)
-      .then(({ body }) => {
-        expect(body.comment).toEqual(
-          expect.objectContaining({
-            comment_id: 7,
-            author: "dav3rid",
-            body: "I R8 8/8 M8",
-            votes: 0,
-            review_id: 1,
-            created_at: expect.any(String),
-          })
-        );
-      });
+      .then((res) =>{
+          expect(res.body.madeComment).toBe("This game slaps!")
+      })
   });
-
-  it('400: "Invalid Input" when body does not contain both "username" and "body" keys', () => {
-    const sentObj = { notaname: "dav3rid", body: "I R8 8/8 M8" };
-
-    return request(app)
-      .post("/api/reviews/1/comments")
-      .send(sentObj)
-      .expect(400)
-      .then((response) => {
-        expect(JSON.parse(response.text)).toEqual({ msg: "Invalid Input" });
-      });
-  });
-
-  it('404: "Resource Not Found" when username not in database tries to post', () => {
-    const sentObj = { username: "Patrik", body: "Pretty good" };
-
-    return request(app)
-      .post("/api/reviews/1/comments")
-      .send(sentObj)
+  test('404: for invalid review_id value ', () => {
+      const username = "mallionaire"
+      const body = "This game slaps!"
+      const review_id = 6969
+      return request(app)
+      .post(`/api/reviews/${review_id}/comments`)
+      .send({username: username,
+          body: body})
       .expect(404)
-      .then((response) => {
-        expect(JSON.parse(response.text)).toEqual({
-          msg: "Resource Not Found",
-        });
-      });
-  });
-
-  it('404: "Resource Not Found" when given number that does not match a :review_id', () => {
-    const sentObj = { username: "dav3rid", body: "I R8 8/8 M8" };
-
-    return request(app)
-      .post("/api/reviews/99999999/comments")
-      .send(sentObj)
-      .expect(404)
-      .then((response) => {
-        expect(JSON.parse(response.text)).toEqual({
-          msg: "Resource Not Found",
-        });
-      });
-  });
-
-  it('400: "Resource Not Found" when given a non-number as :review_id ', () => {
-    const sentObj = { notaname: "dav3rid", body: "I R8 8/8 M8" };
-
-    return request(app)
-      .post("/api/reviews/notanumber/comments")
-      .send(sentObj)
+      .then((res) =>{
+          expect(res.body.msg).toBe("Not Found")
+      })
+  }); 
+  test('400: Given an invalid id input', () => {
+      const username = "mallionaire"
+      const body = "This game slaps!"
+      const review_id = "nonsense"
+      return request(app)
+      .post(`/api/reviews/${review_id}/comments`)
+      .send({username: username,
+          body: body})
       .expect(400)
-      .then((response) => {
-        expect(JSON.parse(response.text)).toEqual({ msg: "Invalid Input" });
-      });
+      .then((res)=> {
+          expect(res.body.msg).toBe("Bad request")
+      })
+  }); 
+  test('400: Given an incomplete request, will reject', () => {
+      const review_id = 2
+      const body = "Well, I loved this game!"
+      const username = "mallionaire"
+      return request(app)
+      .post(`/api/reviews/${review_id}/comments`)
+      .send({
+             username : username
+            })
+      .expect(400)
+      .then((res) =>{
+          expect(res.body.msg).toBe("Incomplete input")
+      })
   });
+  test('404: Given a non-existant username input', () => {
+      const username = "wizbit"
+      const body = "This game slaps!"
+      const review_id = 1
+      return request(app)
+      .post(`/api/reviews/${review_id}/comments`)
+      .send({username: username,
+          body: body})
+      .expect(404)
+      .then((res)=> {
+          expect(res.body.msg).toBe("Not Found")
+      })
+  }); 
 });
