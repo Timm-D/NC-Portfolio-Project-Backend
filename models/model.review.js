@@ -37,8 +37,7 @@ exports.updateReview = (review_id, inc_votes) => {
     });
   }
 
-
-exports.fetchReviews = (query) => {
+  exports.fetchReviews = (query) => {
   const selectJoin = `SELECT reviews.*, COUNT(comments.review_id) AS comment_count 
   FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id`;
 
@@ -50,7 +49,7 @@ exports.fetchReviews = (query) => {
   if (query === undefined) {
     return db.query(selectJoin + groupOrder).then((reviews) => {
       return reviews.rows;
-      
+
   if (query !== undefined)
     return db
       .query("SELECT * FROM categories WHERE slug = $1", [query])
