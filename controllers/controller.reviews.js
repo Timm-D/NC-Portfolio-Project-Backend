@@ -1,7 +1,11 @@
 
+const { fetchReviewById, updateReview, fetchReviews } = require("../models/model.review");
+
+
 const { fetchReviewById, fetchCommentsByreview } = require("../models/model.review");
 
 const { fetchReviewById, updateReview} = require("../models/model.review");
+
 
 
 exports.getReviewById = (req, res, next) => {
@@ -12,6 +16,15 @@ exports.getReviewById = (req, res, next) => {
     })
     .catch(next);
 };
+
+
+exports.getReviews = (req, res, next) => {
+  const {category} = req.query
+  fetchReviews(category)
+    .then((reviews) => {
+      res.status(200).send({ reviews });
+    })
+    .catch(next);
 
 
 exports.getCommentsByReview = (req, res, next) => {
@@ -37,5 +50,6 @@ exports.patchReview = (req, res, next) => {
       err.inc_votes = inc_votes;
       next(err);
     });
+
 
 };
