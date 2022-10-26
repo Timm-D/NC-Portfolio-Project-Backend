@@ -79,32 +79,23 @@ exports.fetchCommentsForReview = async ({ review_id }) => {
   return comments.rows;
 };
 
-exports.createComment = (username, review_id, body) => {
-  if (!username || !body) {
+exports.addCommentToReview = (review_id, username, body) => {
+  if (!body || !username) {
     return Promise.reject({
       status: 400,
-      msg: `Ivalid input`,
+      msg: "author info is missing",
     });
   }
+
   return db
     .query(
-      `
-  INSERT INTO comments
-  (author, review_id, votes, created_at, body)
-  VALUES
-  ($1, $2, null , null , $3)
-  RETURNING *;`,
-      [username, review_id, body]
+      `INSERT INTO comments (author, body, review_id) 
+      VALUES ($1, $2, $3) 
+      RETURNING *;`,
+      [username, body, review_id]
     )
-    .then((result) => {
-      const review = result.rows[0];
-      if (!review) {
-        return Promise.reject({
-          status: 404,
-          msg: `Not Found`,
-        });
-      }
-
-      return result.rows[0].body;
+    .then(({ rows }) => {
+      const addComment = rows[0];
+      return addComment;
     });
 };

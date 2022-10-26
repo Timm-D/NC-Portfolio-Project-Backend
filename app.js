@@ -10,7 +10,7 @@ const {
   patchReview,
   getReviews,
   getCommentsForReview,
-  postComment
+  postCommentForReview
 } = require("./controllers/controller.reviews");
 app.use(express.json());
 
@@ -26,7 +26,7 @@ app.get("/api/reviews/:review_id/comments", getCommentsForReview)
 
 app.patch("/api/reviews/:review_id", patchReview)
 
-app.post("/api/reviews:review_id/comments", postComment)
+app.post("/api/reviews/:review_id/comments", postCommentForReview)
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not Found" });

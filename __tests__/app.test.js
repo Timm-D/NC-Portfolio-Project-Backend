@@ -338,71 +338,56 @@ describe("GET/api/reviews/:review_id/comments", () => {
 });
 
 //10
-describe('/api/reviews/:review_id/comments', () => {
-  test('201: creates new comment and returns the comment', () => {
-      const username = "mallionaire"
-      const body = "This game slaps!"
-      const review_id = 2
-      return request(app)
-      .post(`/api/reviews/${review_id}/comments`)
-      .send({username: username,
-             body: body})
+describe("POST: /api/reviews/:reviews_id/comments", () => {
+  test("201: responds with the posted comment", () => {
+    const newComment = {
+      username: "mallionaire",
+      body: "nonsense",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
       .expect(201)
-      .then((res) =>{
-          expect(res.body.madeComment).toBe("This game slaps!")
-      })
+      .then(({ body }) => {
+        expect(body.postedComment).toEqual(
+          expect.objectContaining({
+            review_id: expect.any(Number),
+            author: expect.any(String),
+            body: expect.any(String),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+          })
+        );
+      });
   });
-  test('404: for invalid review_id value ', () => {
-      const username = "mallionaire"
-      const body = "This game slaps!"
-      const review_id = 6969
-      return request(app)
-      .post(`/api/reviews/${review_id}/comments`)
-      .send({username: username,
-          body: body})
-      .expect(404)
-      .then((res) =>{
-          expect(res.body.msg).toBe("Not Found")
-      })
-  }); 
-  test('400: Given an invalid id input', () => {
-      const username = "mallionaire"
-      const body = "This game slaps!"
-      const review_id = "nonsense"
-      return request(app)
-      .post(`/api/reviews/${review_id}/comments`)
-      .send({username: username,
-          body: body})
+
+  test("400: returns error msg if username/comment is missing", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ body: "this is woah!" })
       .expect(400)
-      .then((res)=> {
-          expect(res.body.msg).toBe("Bad request")
-      })
-  }); 
-  test('400: Given an incomplete request, will reject', () => {
-      const review_id = 2
-      const body = "Well, I loved this game!"
-      const username = "mallionaire"
-      return request(app)
-      .post(`/api/reviews/${review_id}/comments`)
-      .send({
-             username : username
-            })
-      .expect(400)
-      .then((res) =>{
-          expect(res.body.msg).toBe("Incomplete input")
-      })
+      .then(({ body }) => {
+        expect(body.msg).toBe("author info is missing");
+      });
   });
-  test('404: Given a non-existant username input', () => {
-      const username = "wizbit"
-      const body = "This game slaps!"
-      const review_id = 1
-      return request(app)
-      .post(`/api/reviews/${review_id}/comments`)
-      .send({username: username,
-          body: body})
+
+  test("404: returns error msg if passed a review id that doesn't exist", () => {
+    return request(app)
+      .post("/api/reviews/9999999/comments")
+      .send({ username: "mallionaire", body: "nonsense" })
       .expect(404)
-      .then((res)=> {
-          expect(res.body.msg).toBe("Not Found")
-      })
-  }); 
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+
+  test("400: returns error msg if passed no username or comment info", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("author info is missing");
+      });
+  });
 });
