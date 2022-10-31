@@ -1,5 +1,10 @@
-const { fetchReviewById, updateReview, fetchReviews } = require("../models/model.review");
-
+const {
+  fetchReviewById,
+  updateReview,
+  fetchReviews,
+  fetchCommentsForReview,
+  addCommentToReview,
+} = require("../models/model.review");
 
 exports.getReviewById = (req, res, next) => {
   const { review_id } = req.params;
@@ -10,16 +15,14 @@ exports.getReviewById = (req, res, next) => {
     .catch(next);
 };
 
-
 exports.getReviews = (req, res, next) => {
-  const {category} = req.query
+  const { category } = req.query;
   fetchReviews(category)
     .then((reviews) => {
       res.status(200).send({ reviews });
     })
     .catch(next);
-
-}
+};
 exports.patchReview = (req, res, next) => {
   const { review_id } = req.params;
   const {
@@ -35,6 +38,31 @@ exports.patchReview = (req, res, next) => {
       err.inc_votes = inc_votes;
       next(err);
     });
+};
 
+exports.getCommentsForReview = (req, res, next) => {
+  fetchCommentsForReview(req.params)
+    .then((comments) => {
+      res.status(200).send({ comments });
+    })
+    .catch(next);
+};
 
+exports.postCommentForReview = (request, response, next) => {
+  const { review_id } = request.params;
+  const { username, body } = request.body;
+
+  fetchReviewById(review_id)
+    .then(() => {
+      addCommentToReview(review_id, username, body)
+        .then((postedComment) => {
+          response.status(201).send({ postedComment });
+        })
+        .catch((err) => {
+          next(err);
+        });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

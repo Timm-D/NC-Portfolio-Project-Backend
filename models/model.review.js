@@ -1,6 +1,7 @@
 const db = require("../db/connection");
 const format = require("pg-format");
 const reviews = require("../db/data/test-data/reviews");
+const { checkIfDataExists } = require("./model.check");
 
 exports.fetchReviewById = (review_id) => {
   return db
@@ -25,7 +26,7 @@ exports.updateReview = (review_id, inc_votes) => {
   return db
     .query(
       `UPDATE reviews SET votes = votes + $2
-   WHERE review_id = $1 RETURNING *`,
+     WHERE review_id = $1 RETURNING *`,
       [review_id, inc_votes]
     )
     .then(({ rows: [review] }) => {
@@ -33,23 +34,19 @@ exports.updateReview = (review_id, inc_votes) => {
         return Promise.reject({ status: 404, msg: "Not Found" });
       }
       return review;
-
     });
-  }
+};
 
-  exports.fetchReviews = (query) => {
-  const selectJoin = `SELECT reviews.*, COUNT(comments.review_id) AS comment_count 
-  FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id`;
-
+exports.fetchReviews = (query) => {
+  const selectJoin = `SELECT reviews.*, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id`;
   const queryStatement = " WHERE reviews.category = $1";
-
-  const groupOrder = ` GROUP BY comments.review_id, reviews.review_id 
-  ORDER BY created_at DESC`;
+  const groupOrder = ` GROUP BY comments.review_id, reviews.review_id ORDER BY created_at DESC`;
 
   if (query === undefined) {
     return db.query(selectJoin + groupOrder).then((reviews) => {
       return reviews.rows;
-
+    });
+  }
   if (query !== undefined)
     return db
       .query("SELECT * FROM categories WHERE slug = $1", [query])
@@ -57,7 +54,7 @@ exports.updateReview = (review_id, inc_votes) => {
         if (response.rows.length === 0) {
           return Promise.reject({
             status: 404,
-            message: "Not Found",
+            message: "Sorry, there are no categories matching that query.",
           });
         }
         return db
@@ -66,4 +63,39 @@ exports.updateReview = (review_id, inc_votes) => {
             return review.rows;
           });
       });
+};
+
+exports.fetchCommentsForReview = async ({ review_id }) => {
+  const comments = await db.query(
+    "SELECT * FROM comments WHERE review_id = $1;",
+    [review_id]
+  );
+
+  if (!comments.rows.length) {
+    await checkIfDataExists("reviews", "review_id", review_id);
+
+    return [{}];
+  }
+  return comments.rows;
+};
+
+exports.addCommentToReview = (review_id, username, body) => {
+  if (!body || !username) {
+    return Promise.reject({
+      status: 400,
+      msg: "author info is missing",
+    });
+  }
+
+  return db
+    .query(
+      `INSERT INTO comments (author, body, review_id) 
+      VALUES ($1, $2, $3) 
+      RETURNING *;`,
+      [username, body, review_id]
+    )
+    .then(({ rows }) => {
+      const addComment = rows[0];
+      return addComment;
+    });
 };
